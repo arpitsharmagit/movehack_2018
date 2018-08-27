@@ -40,11 +40,9 @@ def load_image_into_numpy_array(image):
   (im_width, im_height) = image.size
   return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
 
-IMAGE_PATH = 'input/'
-SAVE_PATH = "output/"
+VIDEO_PATH = 'input/input.mp4'
+SAVE_PATH = "output/output.mp4"
 TEST_IMAGE_PATHS = [os.path.join(r,file) for r,d,f in os.walk(IMAGE_PATH) for file in f]
-
-# Size, in inches, of the output images.
 
 with detection_graph.as_default():
   with tf.Session(graph=detection_graph) as sess:
@@ -57,30 +55,32 @@ with detection_graph.as_default():
     detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
     detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
     num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-    for image_path in TEST_IMAGE_PATHS:
-      print('Input Image => {}'.format(image_path))
-      image = cv.imread(image_path,cv.IMREAD_COLOR )
-      encode_param = [int(cv.IMWRITE_JPEG_QUALITY), 90]
-      result, encimg = cv.imencode('.jpg', image, encode_param)
-      print('Decoding Image => {}'.format(result))
-      image_np = cv.imdecode(encimg, 1)	
-      image_np_expanded = np.expand_dims(image_np, axis=0)
-      print("Detecting...")
-      (boxes, scores, classes, num) = sess.run(
-          [detection_boxes, detection_scores, detection_classes, num_detections],
-          feed_dict={image_tensor: image_np_expanded})
-      print("Labeling image...")
-      vis_util.visualize_boxes_and_labels_on_image_array(
-          image_np,
-          np.squeeze(boxes),
-          np.squeeze(classes).astype(np.int32),
-          np.squeeze(scores),
-          category_index,
-          use_normalized_coordinates=True,
-          line_thickness=2)
-      pngResult,pngEncodedImg = cv.imencode(".png", image_np)
-      print('Encoding Image => {}'.format(pngResult));
-      save_path =os.path.join(SAVE_PATH, os.path.basename(os.path.normpath(image_path)))
-      cv.imwrite(save_path,image_np)      
-      print('Saving Image => {}'.format(save_path)) 
-      print('                               ') 
+
+    print('[INFO] Starting video feed...')
+    video_capture = cv.VideoCapture(VIDEO_PATH)
+    flag = True
+    while(flag):
+        flag, frame = video_capture.read()
+        if flag==True:            
+            image_np = cv.cvtColor(frame, cv.COLOR_RGB2BGR)            
+            cv.imshow('Video', image_np)            	
+            image_np_expanded = np.expand_dims(image_np, axis=0)
+            (boxes, scores, classes, num) = sess.run(
+                [detection_boxes, detection_scores, detection_classes, num_detections],
+                feed_dict={image_tensor: image_np_expanded})
+            vis_util.visualize_boxes_and_labels_on_image_array(
+                image_np,
+                np.squeeze(boxes),
+                np.squeeze(classes).astype(np.int32),
+                np.squeeze(scores),
+                category_index,
+                use_normalized_coordinates=True,
+                line_thickness=2)
+            cv.imshow('Video', image_np) 
+        else:
+            break
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+     print('[INFO] Terminating Video feed...')
+     video_capture.release()
+     cv.destroyAllWindows()

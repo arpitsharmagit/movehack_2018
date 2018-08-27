@@ -184,6 +184,7 @@ def draw_bounding_box_on_image(image,
         [(left, text_bottom - text_height - 2 * margin), (left + text_width,
                                                           text_bottom)],
         fill=color)
+    print('detection => {}'.format(display_str))
     draw.text(
         (left + margin, text_bottom - text_height - margin),
         display_str,

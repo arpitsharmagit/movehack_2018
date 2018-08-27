@@ -4,6 +4,16 @@ This repository contains demo code for Outliers on Indian Roads(Artificial Intel
 
 ## Installation on ubuntu 16.04
 1. Tensorflow https://www.tensorflow.org/install/
+2. run below commands on terminal.
+
+    `pip install -r requirements.txt`
+
+    `sudo apt-get install protobuf-compiler`
+
+    `protoc object_detection/protos/*.proto --python_out=.`
+
+    `export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim`
+
 2. OpenCV, numpy
    `sudo apt-get install python-opencv numpy`
 
