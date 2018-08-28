@@ -21,10 +21,10 @@ from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_CKPT = os.path.join('data', 'frozen_inference_graph_15K.pb')
+PATH_TO_CKPT = os.path.join('data', 'frozen_inference_graph_20k.pb')
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('data', 'label_map_15k.pbtxt')
-NUM_CLASSES = 13
+PATH_TO_LABELS = os.path.join('data', 'label_map_20k.pbtxt')
+NUM_CLASSES = 12
 
 detection_graph = tf.Graph()
 with detection_graph.as_default():

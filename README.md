@@ -4,6 +4,7 @@ This repository contains demo code for Outliers on Indian Roads(Artificial Intel
 
 ## Installation on ubuntu 16.04
 1. Tensorflow https://www.tensorflow.org/install/
+    tensorflow 1.10, Python 3.5
 2. run below commands on terminal.
 
     `pip install -r requirements.txt`
