@@ -5,12 +5,14 @@ import sys
 import tarfile
 import tensorflow as tf
 import zipfile
-import cv2 as cv;
+import cv2 as cv
+import time
 
 from collections import defaultdict
 from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
+from cv2 import VideoWriter, VideoWriter_fourcc
 
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
@@ -40,9 +42,11 @@ def load_image_into_numpy_array(image):
   (im_width, im_height) = image.size
   return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
 
-VIDEO_PATH = 'input/input.mp4'
-SAVE_PATH = "output/output.mp4"
-TEST_IMAGE_PATHS = [os.path.join(r,file) for r,d,f in os.walk(IMAGE_PATH) for file in f]
+VIDEO_PATH = 'input/Mumbai.mp4'
+SAVE_PATH = "Mumbai_Demo.mp4"
+fourcc = VideoWriter_fourcc(*"MP4V")
+fps=30.0
+image_size=(1280,720)
 
 with detection_graph.as_default():
   with tf.Session(graph=detection_graph) as sess:
@@ -58,9 +62,12 @@ with detection_graph.as_default():
 
     print('[INFO] Starting video feed...')
     video_capture = cv.VideoCapture(VIDEO_PATH)
+    vid = VideoWriter(os.path.join(os.path.abspath("output"), SAVE_PATH),fourcc, fps, image_size)
     flag = True
+    count = 0;
     while(flag):
         flag, frame = video_capture.read()
+        # time.sleep(0.2)
         if flag==True:            
             image_np = cv.cvtColor(frame, cv.COLOR_RGB2BGR)            
             cv.imshow('Video', image_np)            	
@@ -76,11 +83,16 @@ with detection_graph.as_default():
                 category_index,
                 use_normalized_coordinates=True,
                 line_thickness=2)
-            cv.imshow('Video', image_np) 
+            final_image =  cv.cvtColor(image_np, cv.COLOR_RGB2BGR)
+            cv.imshow('Video', final_image)             
+            save_path =os.path.join(SAVE_PATH, os.path.basename(os.path.normpath("frame%d.jpg" % count)))
+            vid.write(final_image)
+            # cv.imwrite(save_path,final_image)  
+            count=count+1
         else:
             break
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
-     print('[INFO] Terminating Video feed...')
-     video_capture.release()
-     cv.destroyAllWindows()
+    print('[INFO] Terminating Video feed...')
+    video_capture.release()
+    cv.destroyAllWindows()
